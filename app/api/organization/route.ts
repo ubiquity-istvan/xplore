@@ -21,30 +21,34 @@ export async function GET(request: Request) {
     return res.json();
   };
 
-  const getEvents = async (organisationID: string) => {
+  const getEvents = async (orgIDs: any) => {
     // const organisation = await getOrganisation();
     // const organisationID = organisation.organizations[0].id;
 
-    const url = `https://www.eventbriteapi.com/v3/organizations/${organisationID}/events/?expand=ticket_availability`;
-    const options = {
-      method: "GET",
-      headers: {
-        accept: "application/json",
-        authorization: "Bearer UMT4EZZJC53JGSMGCHKG",
-      },
-    };
+    orgIDs.map((org: any) => {
+      const url = `https://www.eventbriteapi.com/v3/organizations/${organisationID}/events/?expand=ticket_availability`;
+      const options = {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          authorization: "Bearer UMT4EZZJC53JGSMGCHKG",
+        },
+      };
 
-    const res = await fetch(url, options);
+      const res = await fetch(url, options);
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch data.");
-    }
+      if (!res.ok) {
+        throw new Error("Failed to fetch data.");
+      }
 
-    return res.json();
+      return res.json();
+    });
   };
 
   const organization = await getOrganization();
   const organizations = organization.organizations;
+
+  const events = await getEvents();
 
   console.log(organizations);
 
