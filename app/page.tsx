@@ -1,10 +1,9 @@
 import Image from "next/image";
 import { getegid } from "process";
+import { useEffect } from "react";
 import Button from "./Button";
+import Link from "next/link";
 
-// Event Brite events test.
-// This comment should be visible on the new branch
-// Another code for the new branch
 const getOrganisation = async () => {
   const url = "https://www.eventbriteapi.com/v3/users/me/organizations/";
   const options = {
@@ -50,6 +49,7 @@ const getTickets = async (event: string) => {
 const getEvents = async () => {
   const organisation = await getOrganisation();
   const organisationID = organisation.organizations[0].id;
+  // Org ID: 1835802819703
 
   const url = `https://www.eventbriteapi.com/v3/organizations/${organisationID}/events/?expand=ticket_availability`;
   const options = {
@@ -70,49 +70,42 @@ const getEvents = async () => {
 };
 
 export default async function Home() {
-  const organisation = await getOrganisation();
-  const organisationID = organisation.organizations[0].id;
-
   const events = await getEvents();
+  const org = await getOrganisation();
 
-  // console.log(events.events[0]);
-
-  // console.log("Org");
-  // console.log(organisationID);
+  // console.log(org);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <div className="flex flex-col gap-16">
         <h1 className="text-4xl font-bold">Fetching events</h1>
-        <p>JSX should be working now.</p>
         {/* Events */}
         <div className="grid grid-cols-2 gap-8">
-          {events.events.map(async (event: any) => {
+          {events.events.map((event: any) => {
             const name = event.name.text;
-            const eventID = event.id;
-            const ticketsDetails = await getTickets(eventID);
-            const tickets = ticketsDetails.ticket_classes;
-            console.log(`Tickets for: ${name}`);
+            const ticketInfo = event.ticket_availability;
+            const hasAvailableTickets = ticketInfo.has_available_tickets;
+            const availableText = "Tickets available";
+            const runOutText = "Nor more tickets left";
+            const ticketsFrom = ticketInfo.minimum_ticket_price.display;
+            const ticketsTo = ticketInfo.minimum_ticket_price.display;
+
+            console.log(event.id);
+
             return (
-              <div className="flex flex-col gap-4 items-start">
-                <h2 className="text-2xl font-bold">{name}</h2>
-                <div>
-                  Tickets
-                  {tickets.map((ticket: any) => {
-                    console.log(ticket.name);
-                    return (
-                      <div className="grid grid-cols-2 gap-8">
-                        <div>
-                          <p>{ticket.name}:</p>
-                        </div>
-                        <div>
-                          <p>{ticket.cost.display}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
+              <div className="flex flex-col prose">
+                <h1>{name}</h1>
+                {hasAvailableTickets ? (
+                  <p>{availableText}</p>
+                ) : (
+                  <p>{runOutText}</p>
+                )}
+                <div className="flex gap-2">
+                  <p>Tickets from: {ticketsFrom}</p>
+                  <p>-</p>
+                  <p>Tickets to: {ticketsTo}</p>
                 </div>
-                <Button eventID={eventID}>Buy tickets</Button>
+                <Link href={`/${event.id}`}>But tickets</Link>
               </div>
             );
           })}
