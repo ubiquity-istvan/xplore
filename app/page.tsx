@@ -2,6 +2,8 @@ import Image from "next/image";
 import { getegid } from "process";
 import Button from "./Button";
 
+// Event Brite events test.
+
 const getOrganisation = async () => {
   const url = "https://www.eventbriteapi.com/v3/users/me/organizations/";
   const options = {
